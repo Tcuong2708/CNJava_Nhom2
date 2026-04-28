@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Đánh giá từ khách hàng</title>
+    <div th:fragment="extra_css">
+        <link rel="stylesheet" th:href="@{/css/review.css}" />
+    </div>
+</head>
+<div th:fragment="body_content">
+    <section class="testimonial-section">
+        <div class="container">
+            <h2 class="section-title text-center mb-5">
+                <i class="bi bi-chat-quote-fill me-3 text-gold"></i>Khách Hàng Nói Gì Về Chúng Tôi
+            </h2>
+
+            <div class="testimonial-box shadow-lg">
+                <div class="nav-arrow left" onclick="prevTestimonial()">&#10094;</div>
+                <div class="nav-arrow right" onclick="nextTestimonial()">&#10095;</div>
+
+                <div class="testimonial-content">
+                    <img id="avatar" class="testimonial-img mb-3"
+                         src="https://ui-avatars.com/api/?name=User&background=C5A017&color=fff" alt="avatar" />
+                    <div class="stars mb-2" id="stars"></div>
+                    <h5 class="testimonial-name fw-bold" id="name"></h5>
+                    <p class="testimonial-text fst-italic" id="text"></p>
+
+                    <button class="delete-btn btn btn-sm btn-outline-danger mt-3" id="deleteBtn" onclick="deleteTestimonial()">
+                        <i class="bi bi-trash"></i> Xóa
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-section mt-5 p-4 shadow-sm">
+                <h3 class="mb-4 text-navy fw-bold text-center">
+                    <i class="bi bi-pencil-square me-2 text-gold"></i>Gửi đánh giá của bạn
+                </h3>
+                <form id="reviewForm" onsubmit="submitReview(event)" class="row g-3">
+                    <div class="col-md-6">
+                        <label for="userName" class="form-label fw-bold">Họ và tên</label>
+                        <input type="text" id="userName" class="form-control" required placeholder="Nhập tên của bạn..." />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="userStars" class="form-label fw-bold">Mức độ hài lòng</label>
+                        <select id="userStars" class="form-select" required>
+                            <option value="">-- Chọn mức đánh giá --</option>
+                            <option value="5">⭐⭐⭐⭐⭐ - Tuyệt vời (5 sao)</option>
+                            <option value="4">⭐⭐⭐⭐ - Rất tốt (4 sao)</option>
+                            <option value="3">⭐⭐⭐ - Tạm được (3 sao)</option>
+                            <option value="2">⭐⭐ - Cần cải thiện (2 sao)</option>
+                            <option value="1">⭐ - Tệ (1 sao)</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label for="userText" class="form-label fw-bold">Nhận xét chi tiết</label>
+                        <textarea id="userText" class="form-control" rows="4" required placeholder="Chia sẻ trải nghiệm của bạn tại MAY HOTEL..."></textarea>
+                    </div>
+                    <div class="col-12 text-center">
+                        <button type="submit" class="btn btn-primary px-5 py-2 text-uppercase fw-bold">
+                            <i class="bi bi-send-fill me-2"></i> Gửi Đánh Giá
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+</div>
+
+<div th:fragment="extra_js">
+    <script th:src="@{/js/review.js}"></script>
+</div>
+
+</html>
