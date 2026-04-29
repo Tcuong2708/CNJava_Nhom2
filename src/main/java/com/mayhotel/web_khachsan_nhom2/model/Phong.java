@@ -36,6 +36,10 @@ public class Phong {
     @Column(name = "SoGiuongPhuToiDa") // int, mặc định là 0
     private Integer soGiuongPhuToiDa;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "MaLoai", insertable = false, updatable = false)
+    private LoaiPhong loaiPhong;
+
     // --- Constructors ---
     public Phong() {
     }
@@ -111,5 +115,13 @@ public class Phong {
 
     public void setSoGiuongPhuToiDa(Integer soGiuongPhuToiDa) {
         this.soGiuongPhuToiDa = soGiuongPhuToiDa;
+    }
+
+    public LoaiPhong getLoaiPhong() {
+        return loaiPhong;
+    }
+
+    public void setLoaiPhong(LoaiPhong loaiPhong) {
+        this.loaiPhong = loaiPhong;
     }
 }
