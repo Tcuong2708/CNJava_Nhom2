@@ -47,6 +47,7 @@ public class HomeController {
         }
         model.addAttribute("phong", phong);
         model.addAttribute("conPhong", phong.getMaTrangThai() == 1);
+        model.addAttribute("pageTitle", "Chi tiết phòng " + phong.getName());
         return render(model, "detail");
     }
     /**
