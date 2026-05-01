@@ -44,7 +44,7 @@ public class AccountController extends BaseController {
 
     @GetMapping("/account/logout")
     public String logout(HttpSession session) {
-        session.removeAttribute("user");
-        return "redirect:/Account/login";
+        session.invalidate();
+        return "redirect:/account/login";
     }
 }
