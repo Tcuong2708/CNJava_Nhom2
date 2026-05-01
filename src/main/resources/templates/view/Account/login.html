@@ -1,10 +1,79 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Đăng nhập hệ thống</title>
 </head>
 <body>
+<div th:fragment="body_content">
+    <!-- CSS riêng cho trang Login (nếu cần) -->
+    <th:block th:fragment="extra_css">
+        <link rel="stylesheet" th:href="@{/css/Account/login.css}" />
+    </th:block>
 
+    <div class="login-wrapper">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-5">
+                    <div class="card card-login shadow-lg border-0">
+
+                        <div class="card-header-login text-center py-4 bg-navy text-white">
+                            <h2 class="fw-bold">Đăng nhập</h2>
+                            <p class="mb-0 small opacity-75">Chào mừng bạn trở lại với MAY HOTEL</p>
+                        </div>
+
+                        <div class="card-body p-4 p-md-5">
+
+                            <!-- Thông báo lỗi (Tương đương @if (ViewBag.Error != null)) -->
+                            <div th:if="${error != null}" class="alert alert-danger text-center mb-4" role="alert">
+                                <i class="bi bi-exclamation-circle-fill me-2"></i>
+                                <span th:text="${error}">Thông báo lỗi ở đây</span>
+                            </div>
+
+                            <!-- Form Đăng nhập (Tương đương @using (Html.BeginForm())) -->
+                            <form th:action="@{/account/login}" method="post">
+
+                                <!-- Spring Security tự động xử lý Anti-Forgery Token nếu bạn dùng Thymeleaf form -->
+
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold text-navy">Tên đăng nhập</label>
+                                    <input type="text" name="TenDangNhap" class="form-control form-control-lg"
+                                           placeholder="Nhập tên đăng nhập của bạn" required />
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold text-navy">Mật khẩu</label>
+                                    <input type="password" name="MatKhau" class="form-control form-control-lg"
+                                           placeholder="Nhập mật khẩu" required />
+                                </div>
+
+                                <div class="d-flex justify-content-end mb-3">
+                                    <a th:href="@{/account/forgot-password}" class="small fw-bold text-decoration-none"
+                                       style="color: #d4af37;"> <!-- Gold Color -->
+                                        Quên mật khẩu?
+                                    </a>
+                                </div>
+
+                                <button type="submit" class="btn btn-login w-100 py-3 fw-bold shadow-sm">
+                                    <i class="bi bi-box-arrow-in-right me-2"></i> ĐĂNG NHẬP
+                                </button>
+                            </form>
+
+                            <div class="login-footer text-center mt-4">
+                                <p class="mb-1">Chưa có tài khoản? <a th:href="@{/account/register}" class="fw-bold">Đăng ký ngay</a></p>
+                                <p class="mt-2">
+                                    <a th:href="@{/}" class="small text-muted text-decoration-none">
+                                        <i class="bi bi-arrow-left me-1"></i> Quay về trang chủ
+                                    </a>
+                                </p>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
