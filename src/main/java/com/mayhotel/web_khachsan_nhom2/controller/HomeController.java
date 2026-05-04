@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.util.List;
 
 @Controller
-public class HomeController {
+public class HomeController  {
 
     @Autowired
     private PhongRepository phongRepository;
@@ -55,7 +55,7 @@ public class HomeController {
      * @param pageName Tên file html trong thư mục view/home/
      */
     private String render(Model model, String pageName) {
-        String viewPath = "view/home/" + pageName;
+        String viewPath = "view/Home/" + pageName;
 
         model.addAttribute("view", viewPath);
         model.addAttribute("extra_css", viewPath + " :: extra_css");

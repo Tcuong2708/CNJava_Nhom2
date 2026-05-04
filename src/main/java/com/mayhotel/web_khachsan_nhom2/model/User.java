@@ -10,7 +10,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "IDTaiKhoan")
-    private Integer IDTaiKhoan;
+    private Integer idTaiKhoan;
 
     @Column(name = "TenDangNhap")
     private String tenDangNhap;
@@ -18,15 +18,19 @@ public class User {
     @Column(name = "MatKhau")
     private String matKhau;
 
+    @Column(name = "HoTen", columnDefinition = "NVARCHAR(255)")
+    private String hoTen;
+
     @Column(name = "SoDienThoai")
     private String soDienThoai;
 
-    @Column(name = "DiaChi")
-    private String DiaChi;
+    @Column(name = "DiaChi", columnDefinition = "NVARCHAR(500)")
+    private String diaChi;
 
     @Column(name = "RoleID")
     private Integer roleID;
 
-    @Column(name = "QuocTich")
-    private String QuocTich;
+    @Column(name = "QuocTich", columnDefinition = "NVARCHAR(100)")
+    private String quocTich;
+
 }
