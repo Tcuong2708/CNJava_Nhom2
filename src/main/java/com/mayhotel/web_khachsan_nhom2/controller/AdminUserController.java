@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -48,7 +49,7 @@ public class AdminUserController extends BaseController {
         }
 
         setPageTitle(model, "Chi tiết tài khoản: " + user.getTenDangNhap());
-        model.addAttribute("u", user);
+        model.addAttribute("user", user);
         return render(model, "view/Admin/User/details");
     }
 
@@ -64,6 +65,78 @@ public class AdminUserController extends BaseController {
             }
         } catch (Exception e) {
             ra.addFlashAttribute("error", "Không thể xóa tài khoản này (có thể đã có dữ liệu liên quan như hóa đơn).");
+        }
+        return "redirect:/admin/users";
+    }
+
+    // 4. Trang chỉnh sửa người dùng (GET)
+    @GetMapping("/edit/{id}")
+    public String edit(@PathVariable("id") Integer id, Model model, RedirectAttributes ra) {
+        User user = userRepository.findById(id).orElse(null);
+
+        if (user == null) {
+            ra.addFlashAttribute("error", "Không tìm thấy người dùng để chỉnh sửa!");
+            return "redirect:/admin/users";
+        }
+
+        setPageTitle(model, "Chỉnh sửa tài khoản: " + user.getTenDangNhap());
+        model.addAttribute("user", user);
+
+        return render(model, "view/Admin/User/edit");
+    }
+
+    // 5. Xử lý cập nhật thông tin người dùng (POST)
+    @PostMapping("/edit")
+    public String update(User user, RedirectAttributes ra) {
+        try {
+
+            User existingUser = userRepository.findById(user.getIdTaiKhoan()).orElse(null);
+
+            if (existingUser == null) {
+                ra.addFlashAttribute("error", "Không tìm thấy người dùng để cập nhật!");
+                return "redirect:/admin/users";
+            }
+
+            existingUser.setHoTen(user.getHoTen());
+            existingUser.setSoDienThoai(user.getSoDienThoai());
+            existingUser.setDiaChi(user.getDiaChi());
+            existingUser.setQuocTich(user.getQuocTich());
+            existingUser.setRoleID(user.getRoleID());
+
+            userRepository.save(existingUser);
+            ra.addFlashAttribute("success", "Cập nhật thông tin tài khoản thành công!");
+
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", "Có lỗi xảy ra trong quá trình cập nhật: " + e.getMessage());
+        }
+
+        return "redirect:/admin/users";
+    }
+
+    // 6. Trang thêm mới người dùng (GET)
+    @GetMapping("/create")
+    public String create(Model model) {
+        setPageTitle(model, "Thêm mới tài khoản");
+
+        // Truyền một đối tượng User trống để Thymeleaf binding
+        model.addAttribute("user", new User());
+
+        return render(model, "view/Admin/User/create");
+    }
+
+    // 7. Xử lý lưu người dùng mới (POST)
+    @PostMapping("/create")
+    public String store(User user, RedirectAttributes ra) {
+        try {
+            // Kiểm tra xem tên đăng nhập đã tồn tại chưa
+            // if (userRepository.existsByTenDangNhap(user.getTenDangNhap())) { ... }
+
+            // Lưu người dùng mới
+            userRepository.save(user);
+            ra.addFlashAttribute("success", "Thêm mới tài khoản thành công!");
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", "Lỗi khi tạo tài khoản: " + e.getMessage());
+            return "redirect:/admin/users/create";
         }
         return "redirect:/admin/users";
     }
