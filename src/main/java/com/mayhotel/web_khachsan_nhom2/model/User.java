@@ -7,6 +7,14 @@ import lombok.Data;
 @Table(name = "Account")
 @Data
 public class User {
+    public Integer getIdTaiKhoan() {
+        return idTaiKhoan;
+    }
+
+    public void setIdTaiKhoan(Integer idTaiKhoan) {
+        this.idTaiKhoan = idTaiKhoan;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "IDTaiKhoan")
@@ -29,6 +37,62 @@ public class User {
 
     @Column(name = "RoleID")
     private Integer roleID;
+
+    public String getMatKhau() {
+        return matKhau;
+    }
+
+    public void setMatKhau(String matKhau) {
+        this.matKhau = matKhau;
+    }
+
+    public String getHoTen() {
+        return hoTen;
+    }
+
+    public void setHoTen(String hoTen) {
+        this.hoTen = hoTen;
+    }
+
+    public String getSoDienThoai() {
+        return soDienThoai;
+    }
+
+    public void setSoDienThoai(String soDienThoai) {
+        this.soDienThoai = soDienThoai;
+    }
+
+    public String getDiaChi() {
+        return diaChi;
+    }
+
+    public void setDiaChi(String diaChi) {
+        this.diaChi = diaChi;
+    }
+
+    public Integer getRoleID() {
+        return roleID;
+    }
+
+    public void setRoleID(Integer roleID) {
+        this.roleID = roleID;
+    }
+
+    public String getQuocTich() {
+        return quocTich;
+    }
+
+    public void setQuocTich(String quocTich) {
+        this.quocTich = quocTich;
+    }
+
+    public String getTenDangNhap() {
+        return tenDangNhap;
+    }
+
+    public void setTenDangNhap(String tenDangNhap) {
+        this.tenDangNhap = tenDangNhap;
+    }
 
     @Column(name = "QuocTich", columnDefinition = "NVARCHAR(100)")
     private String quocTich;
