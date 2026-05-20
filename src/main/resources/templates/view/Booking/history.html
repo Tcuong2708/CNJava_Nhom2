@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:fragment="extra_css">
+    <link rel="stylesheet" th:href="@{/css/Booking/history.css}" />
+    <style>
+        .table thead th {
+            border: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .badge-upcoming {
+            background-color: #e0f2fe;
+            color: #0369a1;
+        }
+        .badge-completed {
+            background-color: #f0fdf4;
+            color: #15803d;
+        }
+    </style>
+</th:block>
+
+<div th:fragment="body_content">
+    <div class="container py-5">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="text-navy fw-bold text-uppercase border-start border-5 border-warning ps-3">
+                Lịch sử đặt phòng
+            </h3>
+            <a th:href="@{/}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-house-door me-2"></i>Trang chủ
+            </a>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-navy text-white">
+                        <tr>
+                            <th class="ps-4 py-3">Mã HĐ</th>
+                            <th>Ngày đặt</th>
+                            <th>Thời gian lưu trú</th>
+                            <th class="text-end">Tổng tiền</th>
+                            <th class="text-center">Trạng thái</th>
+                            <th class="text-center">Chi tiết</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <th:block th:if="${historyList != null && !#lists.isEmpty(historyList)}">
+                            <tr th:each="item : ${historyList}">
+
+                                <td class="ps-4 fw-bold" th:text="'#' + ${item.id}">#001</td>
+
+                                <td class="text-muted small" th:text="${#temporals.format(item.ngayDat, 'dd/MM/yyyy HH:mm')}">01/01/2026 00:00</td>
+
+                                <td>
+                                    <div class="d-flex flex-column small">
+                                            <span>
+                                                <i class="bi bi-box-arrow-in-right text-success me-1"></i>
+                                                <th:block th:text="${#temporals.format(item.ngayCheckIn, 'dd/MM/yyyy')}"></th:block>
+                                            </span>
+                                        <span>
+                                                <i class="bi bi-box-arrow-left text-danger me-1"></i>
+                                                <th:block th:text="${#temporals.format(item.ngayCheckOut, 'dd/MM/yyyy')}"></th:block>
+                                            </span>
+                                    </div>
+                                </td>
+
+                                <td class="text-end fw-bold fs-5 text-gold">
+                                    <span th:text="${#numbers.formatDecimal(item.totalPrice, 0, 'COMMA', 0, 'POINT')}">0</span> <small>đ</small>
+                                </td>
+
+                                <td class="text-center">
+                                        <span th:if="${item.ngayCheckOut.isBefore(#temporals.createToday())}" class="status-badge badge-completed">
+                                            Đã hoàn tất
+                                        </span>
+                                    <span th:unless="${item.ngayCheckOut.isBefore(#temporals.createToday())}" class="status-badge badge-upcoming">
+                                            Sắp tới
+                                        </span>
+                                </td>
+
+                                <td class="text-center">
+                                    <a th:href="@{/booking/history/detail(id=${item.id})}" class="btn btn-sm btn-outline-dark border-0 rounded-circle" title="Xem chi tiết">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </th:block>
+
+                        <tr th:if="${historyList == null || #lists.isEmpty(historyList)}">
+                            <td colspan="6" class="text-center py-5">
+                                <i class="bi bi-receipt text-muted" style="font-size: 3rem;"></i>
+                                <p class="text-muted mt-3">Bạn chưa có lịch sử đặt phòng nào.</p>
+                                <a th:href="@{/rooms}" class="btn btn-warning text-white fw-bold">Đặt phòng ngay</a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div th:fragment="extra_js"></div>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:fragment="extra_css">
+    <link rel="stylesheet" th:href="@{/css/Booking/detail.css}" />
+    <style>
+        .room-thumb {
+            width: 140px !important;
+            height: 90px !important;
+            object-fit: cover !important;
+            border-radius: 8px;
+            border: 2px solid #eee;
+            flex-shrink: 0;
+        }
+    </style>
+</th:block>
+
+<div th:fragment="body_content">
+    <div class="container py-5">
+
+        <div class="mb-3">
+            <a th:href="@{/booking/history}" class="text-decoration-none text-muted fw-bold">
+                <i class="bi bi-arrow-left me-2"></i>Quay lại danh sách
+            </a>
+        </div>
+
+        <div class="invoice-card bg-white">
+
+            <div class="invoice-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="mb-0 text-uppercase fw-bold">Chi tiết đặt phòng</h4>
+                    <small class="opacity-75">Mã hóa đơn: #<th:block th:text="${hoaDon.id}"></th:block></small>
+                </div>
+                <div class="text-end">
+                    <div class="fs-5 fw-bold" th:text="${#temporals.format(hoaDon.ngayDat, 'dd/MM/yyyy')}">01/01/2026</div>
+
+                    <span th:if="${hoaDon.ngayCheckOut.isBefore(#temporals.createToday())}" class="badge bg-success border border-white">
+                        Đã hoàn tất
+                    </span>
+                    <span th:unless="${hoaDon.ngayCheckOut.isBefore(#temporals.createToday())}" class="badge bg-warning text-dark border border-white">
+                        Sắp tới
+                    </span>
+                </div>
+            </div>
+
+            <div class="p-4 p-md-5">
+                <div class="row mb-5">
+                    <div class="col-md-6">
+                        <h5 class="section-title">Thông tin khách hàng</h5>
+                        <p class="mb-1"><strong>Họ tên:</strong> <span th:text="${hoaDon.hoTen}">Tên khách</span></p>
+                        <p class="mb-1"><strong>SĐT:</strong> <span th:text="${hoaDon.sdt}">Số điện thoại</span></p>
+                        <p class="mb-0"><strong>Địa chỉ:</strong>
+                            <span th:text="${(hoaDon.diaChi != null && hoaDon.diaChi != '') ? hoaDon.diaChi : 'Chưa cập nhật'}">Địa chỉ</span>
+                        </p>
+                    </div>
+                    <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                        <h5 class="section-title text-md-end">Thời gian lưu trú</h5>
+                        <p class="mb-1"><i class="bi bi-box-arrow-in-right text-success me-2"></i>Nhận phòng: <strong th:text="${#temporals.format(hoaDon.ngayCheckIn, 'dd/MM/yyyy')}">01/01/2026</strong></p>
+                        <p class="mb-0"><i class="bi bi-box-arrow-left text-danger me-2"></i>Trả phòng: <strong th:text="${#temporals.format(hoaDon.ngayCheckOut, 'dd/MM/yyyy')}">02/01/2026</strong></p>
+                    </div>
+                </div>
+
+                <div class="mb-5">
+                    <h5 class="section-title">Danh sách phòng đặt</h5>
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Phòng</th>
+                                <th class="text-center">Số lượng</th>
+                                <th class="text-end">Đơn giá/Đêm</th>
+                                <th class="text-end">Thành tiền</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <img th:src="@{${(hoaDon.phong != null && hoaDon.phong.imageUrl != null && hoaDon.phong.imageUrl != '') ? '/images/' + hoaDon.phong.imageUrl : '/images/default.png'}}"
+                                         class="room-thumb me-3"
+                                         alt="Room">
+
+                                    <div>
+                                        <div class="fw-bold text-navy" th:text="${hoaDon.phong != null ? hoaDon.phong.name : 'Phòng đã bị xóa'}">Tên phòng</div>
+                                        <small class="text-muted">Mã phòng: <th:block th:text="${hoaDon.maPhong}"></th:block></small>
+                                    </div>
+                                </div>
+                            </td>
+                                <td class="text-center">1</td>
+
+                                <td class="text-end" th:text="${hoaDon.phong != null ? #numbers.formatDecimal(hoaDon.phong.price, 0, 'COMMA', 0, 'POINT') + ' đ' : '-'}">0 đ</td>
+
+                                <td class="text-end fw-bold" th:text="${#numbers.formatDecimal(hoaDon.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="mb-4" th:if="${hoaDon.phuThu != null && hoaDon.phuThu.compareTo(T(java.math.BigDecimal).ZERO) > 0}">
+                    <h5 class="section-title">Phụ thu phát sinh</h5>
+                    <table class="table table-sm table-borderless">
+                        <tr>
+                            <td style="width: 60%">
+                                <i class="bi bi-check2-circle text-gold me-2"></i> Chi phí phụ thu hệ thống
+                            </td>
+                            <td class="text-end text-muted" th:text="${#numbers.formatDecimal(hoaDon.phuThu, 0, 'COMMA', 0, 'POINT')} + ' đ'">
+                                0 đ
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="total-row p-3 rounded">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fs-5 text-muted">Tổng thanh toán:</span>
+                        <span class="fs-3 text-gold" th:text="${#numbers.formatDecimal(hoaDon.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">0 VNĐ</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:fragment="extra_js"></div>
+</html>
