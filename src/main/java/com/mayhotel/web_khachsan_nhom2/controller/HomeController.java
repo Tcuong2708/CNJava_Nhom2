@@ -29,10 +29,12 @@ public class HomeController  {
         return render(model, "index");
     }
 
+/*
     @GetMapping("/review")
     public String review(Model model) {
         return render(model, "review");
     }
+*/
 
     @GetMapping("/info")
     public String info(Model model){
