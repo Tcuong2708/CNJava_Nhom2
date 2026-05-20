@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Cổng thanh toán trực tuyến - MAY HOTEL</title>
+</head>
+<body>
+
+<th:block th:fragment="extra_css">
+    <link rel="stylesheet" th:href="@{/css/Booking/payment_gate.css}" />
+</th:block>
+
+<div th:fragment="body_content">
+    <div class="container py-5">
+        <div class="card shadow border-0 max-width-1000 mx-auto rounded-3 overflow-hidden" style="max-width: 1000px;">
+
+            <div class="bg-navy text-white p-4 text-center">
+                <h3 class="fw-bold m-0 text-uppercase tracking-wide">
+                    <i class="bi bi-shield-check text-gold me-2"></i>Cổng thanh toán an toàn May Hotel
+                </h3>
+                <p class="m-0 opacity-75 small mt-1">Vui lòng chọn ứng dụng thích hợp và tiến hành quét mã QR để hoàn tất đơn đặt phòng</p>
+            </div>
+
+            <div class="card-body p-4 p-md-5 bg-white">
+                <div class="row g-4">
+
+                    <div class="col-md-6 border-end pe-md-4">
+                        <h5 class="fw-bold text-navy mb-3"><i class="bi bi-list-check text-gold me-1"></i> 1. Chọn cổng / Ví / Ngân hàng</h5>
+
+                        <div class="small fw-bold text-muted mb-2 text-uppercase font-monospace" style="font-size: 0.75rem;">Ví điện tử & Thẻ thông minh</div>
+                        <div class="d-flex flex-column gap-2 mb-4">
+                            <label class="w-100 m-0">
+                                <input type="radio" name="gateway" value="VNPAY" class="method-radio d-none" checked onclick="switchGateway('vnpay')" />
+                                <div class="method-item p-3 d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-wallet2 text-navy fs-4 me-3"></i>
+                                        <span>Cổng trực tuyến VNPAY Smart</span>
+                                    </div>
+                                    <span class="badge bg-light text-navy border small">Cổng chính</span>
+                                </div>
+                            </label>
+                            <label class="w-100 m-0">
+                                <input type="radio" name="gateway" value="MOMO" class="method-radio d-none" onclick="switchGateway('momo')" />
+                                <div class="method-item p-3 d-flex align-items-center">
+                                    <i class="bi bi-qr-code text-danger fs-4 me-3"></i>
+                                    <span>Ví điện tử MoMo Siêu Ứng Dụng</span>
+                                </div>
+                            </label>
+                            <label class="w-100 m-0">
+                                <input type="radio" name="gateway" value="ZALOPAY" class="method-radio d-none" onclick="switchGateway('zalopay')" />
+                                <div class="method-item p-3 d-flex align-items-center">
+                                    <i class="bi bi-chat-square-heart text-primary fs-4 me-3"></i>
+                                    <span>Ví điện tử quốc dân ZaloPay</span>
+                                </div>
+                            </label>
+                            <label class="w-100 m-0">
+                                <input type="radio" name="gateway" value="GOOGLEPAY" class="method-radio d-none" onclick="switchGateway('googlepay')" />
+                                <div class="method-item p-3 d-flex align-items-center">
+                                    <i class="bi bi-google text-info fs-4 me-3"></i>
+                                    <span>Ứng dụng quốc tế Google Pay</span>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="small fw-bold text-muted mb-2 text-uppercase font-monospace" style="font-size: 0.75rem;">Chuyển khoản Ngân hàng (VietQR Giả lập)</div>
+                        <div class="d-flex flex-column gap-2">
+                            <label class="w-100 m-0">
+                                <input type="radio" name="gateway" value="VCB" class="method-radio d-none" onclick="switchGateway('vcb')" />
+                                <div class="method-item p-3 d-flex align-items-center">
+                                    <i class="bi bi-bank text-success fs-4 me-3"></i>
+                                    <span>Ngân hàng Vietcombank (VCB)</span>
+                                </div>
+                            </label>
+                            <label class="w-100 m-0">
+                                <input type="radio" name="gateway" value="MB" class="method-radio d-none" onclick="switchGateway('mb')" />
+                                <div class="method-item p-3 d-flex align-items-center">
+                                    <i class="bi bi-credit-card-2-front text-info fs-4 me-3"></i>
+                                    <span>Ngân hàng Quân đội MBBank</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 text-center d-flex flex-column align-items-center justify-content-center ps-md-4 mt-4 mt-md-0">
+                        <h5 class="fw-bold text-navy mb-2"><i class="bi bi-scan text-gold me-1"></i> 2. Quét mã QR thanh toán</h5>
+
+                        <div class="mb-3 bg-light px-3 py-2 rounded border">
+                            <span class="small text-muted">Mã hóa đơn:</span> <strong class="text-navy" th:text="'#' + ${invoice.id}">#1</strong> |
+                            <span class="small text-muted">Cần thanh toán:</span> <strong class="text-danger" th:text="${#numbers.formatDecimal(invoice.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</strong>
+                        </div>
+
+                        <div class="qr-container my-2" id="qrFrame">
+
+                            <div class="qr-overlay" id="expiryOverlay" style="display: none;">
+                                <i class="bi bi-clock-fill text-danger fs-1 mb-2"></i>
+                                <span class="fw-bold text-dark fs-6">Mã QR đặt phòng đã hết hạn!</span>
+                                <small class="text-muted px-3 text-center mt-1">Vui lòng tải mới lại mã QR để tiếp tục giao dịch an toàn.</small>
+                                <button type="button" class="btn btn-sm btn-outline-dark mt-3 fw-bold px-3 rounded-pill" onclick="refreshQR()">
+                                    <i class="bi bi-arrow-clockwise me-1"></i> Tải mới mã QR
+                                </button>
+                            </div>
+
+                            <img id="qrImage"
+                                 th:src="'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=MayHotel_Gateway_VNPAY_Invoice_' + ${invoice.id} + '_Amount_' + ${invoice.totalPrice}"
+                                 width="220" height="220" alt="Mã quét thanh toán May Hotel" class="shadow-sm rounded" />
+                        </div>
+
+                        <div class="mt-3">
+                            <span class="small text-muted"><i class="bi bi-alarm text-warning me-1"></i>Hiệu lực mã QR còn lại:</span>
+                            <span class="badge bg-dark font-monospace px-3 py-2 fs-6 rounded" id="timerBox">05:00</span>
+                        </div>
+
+                        <form th:action="@{/booking/complete-online-payment}" method="post" class="w-100 mt-4">
+                            <input type="hidden" th:name="${_csrf?.parameterName}" th:value="${_csrf?.token}" />
+                            <input type="hidden" name="maHD" th:value="${invoice.id}" />
+
+                            <button type="submit" class="btn btn-gold w-100 py-3 fw-bold text-uppercase shadow-sm rounded-pill">
+                                <i class="bi bi-check-all fs-5 me-1"></i> Xác nhận đã chuyển khoản thành công
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<th:block th:fragment="extra_js">
+    <script th:inline="javascript">
+        let timeLeft = 300; // Đặt mốc thời gian gác cổng 5 phút = 300 giây
+        let timerInterval;
+        const timerBox = document.getElementById('timerBox');
+        const expiryOverlay = document.getElementById('expiryOverlay');
+        const qrImage = document.getElementById('qrImage');
+
+        // Nhận an toàn giá trị Hóa đơn và Số tiền từ phôi Java Thymeleaf
+        const invoiceId = [[${invoice.id}]];
+        const totalPrice = [[${invoice.totalPrice}]];
+        let currentType = "VNPAY";
+
+        // Hàm vận hành đồng hồ đếm ngược
+        function startCountdown() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    timerBox.innerText = "00:00";
+                    expiryOverlay.style.display = "flex"; // Kích hoạt phủ trắng khóa mã QR
+                } else {
+                    timeLeft--;
+                    let minutes = Math.floor(timeLeft / 60);
+                    let seconds = timeLeft % 60;
+                    timerBox.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }
+            }, 1000);
+        }
+
+        // Tự động kích hoạt luồng đếm ngược khi khách mở trang cổng
+        startCountdown();
+
+        // Xử lý nút bấm Tải mới mã QR khi hết hạn hiệu lực
+        function refreshQR() {
+            timeLeft = 300; // Hồi phục mốc 5 phút
+            expiryOverlay.style.display = "none"; // Gỡ bỏ mấm che overlay
+            // Đóng gói chuỗi dữ liệu ép trình duyệt kéo ảnh QR mới tinh
+            qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=MayHotel_Gateway_${currentType.toUpperCase()}_Invoice_${invoiceId}_Amount_${totalPrice}&refresh=${Date.now()}`;
+            startCountdown();
+        }
+
+        // Đổi ảnh mã QR tương ứng khi click chuyển đổi giữa các App/Ngân hàng
+        function switchGateway(type) {
+            if (expiryOverlay.style.display === "flex") return; // Chặn đổi app nếu mã đã hết hạn
+            currentType = type;
+            qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=MayHotel_Gateway_${type.toUpperCase()}_Invoice_${invoiceId}_Amount_${totalPrice}`;
+        }
+    </script>
+</th:block>
+
+</body>
+</html>
