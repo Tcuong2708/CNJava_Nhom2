@@ -6,7 +6,6 @@
 </head>
 <body>
 <div th:fragment="body_content">
-    <!-- CSS riêng cho trang Login (nếu cần) -->
     <th:block th:fragment="extra_css">
         <link rel="stylesheet" th:href="@{/css/Account/login.css}" />
     </th:block>
@@ -24,10 +23,15 @@
 
                         <div class="card-body p-4 p-md-5">
 
-                            <!-- Thông báo lỗi (Tương đương @if (ViewBag.Error != null)) -->
                             <div th:if="${error != null}" class="alert alert-danger text-center mb-4" role="alert">
                                 <i class="bi bi-exclamation-circle-fill me-2"></i>
                                 <span th:text="${error}">Thông báo lỗi ở đây</span>
+                            </div>
+
+                            <div th:if="${param.error != null}" class="alert alert-danger text-center border-0 mb-3 shadow-sm">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                <span th:if="${param.error[0] == 'timeout'}">Phiên đăng nhập của bạn đã hết hạn, vui lòng đăng nhập lại!</span>
+                                <span th:if="${param.error[0] == 'denied'}">Tài khoản của bạn không có đặc quyền truy cập vào phân hệ này!</span>
                             </div>
 
                             <!-- Form Đăng nhập (Tương đương @using (Html.BeginForm())) -->
@@ -47,8 +51,15 @@
                                            placeholder="Nhập mật khẩu" required />
                                 </div>
 
+                                <div class="form-check m-0">
+                                    <input type="checkbox" class="form-check-input" id="rememberMe" name="rememberMe">
+                                    <label class="form-check-label small text-navy fw-bold" for="rememberMe" style="cursor: pointer;">
+                                        Ghi nhớ đăng nhập
+                                    </label>
+                                </div>
+
                                 <div class="d-flex justify-content-end mb-3">
-                                    <a th:href="@{/account/forgot-password}" class="small fw-bold text-decoration-none"
+                                    <a th:href="@{/account/forgot_password}" class="small fw-bold text-decoration-none"
                                        style="color: #d4af37;"> <!-- Gold Color -->
                                         Quên mật khẩu?
                                     </a>
