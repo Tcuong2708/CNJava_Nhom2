@@ -33,7 +33,7 @@ public class AdminRoomController extends BaseController {
         return render(model, "view/Admin/Room/index");
     }
 
-    //PHƯƠNG THỨC XEM CHI TIẾT
+    // PHƯƠNG THỨC XEM CHI TIẾT
     @GetMapping("/details/{id}")
     public String details(@PathVariable("id") Integer id, Model model, RedirectAttributes ra) {
         Phong phong = phongRepository.findById(id).orElse(null);
@@ -46,7 +46,6 @@ public class AdminRoomController extends BaseController {
         setPageTitle(model, "Chi tiết phòng: " + phong.getName());
         model.addAttribute("phong", phong);
 
-        // Trả về file details.html mà chúng ta vừa tạo
         return render(model, "view/Admin/Room/details");
     }
 
@@ -55,19 +54,31 @@ public class AdminRoomController extends BaseController {
     public String create(Model model) {
         setPageTitle(model, "Thêm phòng mới");
         model.addAttribute("phong", new Phong());
-        model.addAttribute("listLoai", loaiPhongRepository.findAll()); // [cite: 20]
+        model.addAttribute("listLoai", loaiPhongRepository.findAll());
         return render(model, "view/Admin/Room/create");
     }
 
-    // Xử lý lưu phòng mới
+    // XỬ LÝ LƯU PHÒNG MỚI (ĐÃ BỔ SUNG RÀNG BUỘC)
     @PostMapping("/create")
     public String store(@ModelAttribute("phong") Phong phong,
                         @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
                         RedirectAttributes ra) {
+
+        // 🌟 LỚP GÁC CỔNG BẢO MẬT: KIỂM TRA RÀNG BUỘC DỮ LIỆU ĐẦU VÀO
+        if (phong.getName() == null || phong.getName().trim().isEmpty()) {
+            ra.addFlashAttribute("error", "Thêm thất bại: Tên phòng không được phép để trống!");
+            return "redirect:/admin/rooms/create";
+        }
+
+        if (phong.getPrice() == null || phong.getPrice().compareTo(java.math.BigDecimal.ZERO) < 0) {
+            ra.addFlashAttribute("error", "Thêm thất bại: Giá phòng nhập vào không được phép là số âm!");
+            return "redirect:/admin/rooms/create"; // Hoặc đường dẫn tương ứng của hàm
+        }
+
         try {
             // 1. Gán giá trị mặc định cho các trường NOT NULL thiếu trong form
             if (phong.getMaTrangThai() == null) {
-                phong.setMaTrangThai(1); // 1 = Trống (theo thiết kế C# của bạn) [cite: 145]
+                phong.setMaTrangThai(1); // 1 = Trống
             }
             if (phong.getSoGiuongPhuToiDa() == null) {
                 phong.setSoGiuongPhuToiDa(0);
@@ -100,7 +111,6 @@ public class AdminRoomController extends BaseController {
         }
     }
 
-
     // HIỂN THỊ FORM EDIT
     @GetMapping("/edit/{id}")
     public String edit(@PathVariable("id") Integer id, Model model, RedirectAttributes ra) {
@@ -115,7 +125,7 @@ public class AdminRoomController extends BaseController {
         return render(model, "view/Admin/Room/edit");
     }
 
-    //XỬ LÝ CẬP NHẬT (UPDATE)
+    // XỬ LÝ CẬP NHẬT (ĐÃ BỔ SUNG RÀNG BUỘC)
     @PostMapping("/edit")
     public String update(@ModelAttribute("phong") Phong phong,
                          BindingResult result,
@@ -127,6 +137,17 @@ public class AdminRoomController extends BaseController {
             System.out.println("===> LOI DỮ LIỆU: " + result.getAllErrors());
             model.addAttribute("listLoai", loaiPhongRepository.findAll());
             return render(model, "view/Admin/Room/edit");
+        }
+
+        // 🌟 LỚP GÁC CỔNG BẢO MẬT: KIỂM TRA RÀNG BUỘC KHI CẬP NHẬT
+        if (phong.getName() == null || phong.getName().trim().isEmpty()) {
+            ra.addFlashAttribute("error", "Cập nhật thất bại: Tên phòng không được phép để trống!");
+            return "redirect:/admin/rooms/edit/" + phong.getId();
+        }
+
+        if (phong.getPrice() == null || phong.getPrice().compareTo(java.math.BigDecimal.ZERO) < 0) {
+            ra.addFlashAttribute("error", "Cập nhật thất bại: Giá phòng nhập vào không được phép là số âm!");
+            return "redirect:/admin/rooms/edit/" + phong.getId();
         }
 
         try {

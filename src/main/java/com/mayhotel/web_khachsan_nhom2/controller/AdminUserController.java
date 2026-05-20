@@ -140,4 +140,32 @@ public class AdminUserController extends BaseController {
         }
         return "redirect:/admin/users";
     }
+
+    // =========================================================================
+    // KHÓA / MỞ KHÓA TÀI KHOẢN
+    // =========================================================================
+    @GetMapping("/toggle-status/{id}")
+    public String toggleStatus(@PathVariable("id") Integer id, RedirectAttributes ra) {
+        try {
+            User user = userRepository.findById(id).orElse(null);
+
+            if (user == null) {
+                ra.addFlashAttribute("error", "Không tìm thấy người dùng!");
+                return "redirect:/admin/users";
+            }
+
+            if (user.getTrangThai() == null || user.getTrangThai() == true) {
+                user.setTrangThai(false); // Khóa tài khoản
+                ra.addFlashAttribute("success", "Đã khóa tài khoản của " + user.getTenDangNhap() + " thành công!");
+            } else {
+                user.setTrangThai(true); // Mở khóa
+                ra.addFlashAttribute("success", "Đã mở khóa hoạt động cho tài khoản " + user.getTenDangNhap() + "!");
+            }
+
+            userRepository.save(user);
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
+        }
+        return "redirect:/admin/users";
+    }
 }
