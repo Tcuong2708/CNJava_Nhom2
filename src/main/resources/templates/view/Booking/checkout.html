@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Xác nhận thanh toán - MAY HOTEL</title>
+</head>
+<body>
+
+<th:block th:fragment="extra_css">
+    <link rel="stylesheet" th:href="@{/css/Booking/checkout.css}" />
+    <style>
+        /* CSS Custom đồng bộ màu sắc thương hiệu của May Hotel */
+        .text-navy { color: #0F2942 !important; }
+        .bg-navy { background-color: #0F2942 !important; }
+        .text-gold { color: #C5A017 !important; }
+        .btn-gold { background-color: #C5A017 !important; color: white !important; border: none !important; transition: 0.3s; }
+        .btn-gold:hover { background-color: #a68512 !important; transform: translateY(-1px); }
+
+        /* Hiệu ứng tương tác cho hộp chọn Phương thức thanh toán */
+        .payment-method-card {
+            border: 2px solid #eee;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .payment-method-card:hover {
+            border-color: #C5A017;
+            background-color: rgba(197, 160, 23, 0.03);
+        }
+        .payment-radio:checked + .payment-method-card {
+            border-color: #0F2942;
+            background-color: rgba(15, 41, 66, 0.04);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .payment-radio:checked + .payment-method-card .bi-check-circle-fill {
+            display: inline-block !important;
+        }
+    </style>
+</th:block>
+
+<div th:fragment="body_content">
+    <div class="container py-5">
+        <div class="row g-4">
+
+            <div class="col-lg-5 order-lg-2">
+                <div class="card shadow-sm border-0 p-4 bg-light">
+                    <h4 class="fw-bold text-navy mb-4 border-bottom pb-2">
+                        <i class="bi bi-receipt text-gold me-2"></i>Tóm tắt phiếu đặt
+                    </h4>
+
+                    <div class="mb-3">
+                        <div class="small fw-bold text-muted text-uppercase mb-2" style="font-size: 0.75rem;">Chi tiết phòng lưu trú</div>
+                        <div th:each="item : ${cart.items}" class="mb-2 pb-2 border-bottom border-light">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="fw-bold text-navy" th:text="${item.loaiPhong.name}">Tên Loại Phòng</span>
+                                <span class="text-navy fw-bold"
+                                      th:text="${#numbers.formatDecimal(item.thanhTien, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</span>
+                            </div>
+                            <div class="d-flex justify-content-between small text-muted">
+                                <span>Số lượng: <th:block th:text="${item.soLuong}"></th:block> phòng x <th:block th:text="${item.soDem}"></th:block> đêm</span>
+                            </div>
+                            <div class="d-flex justify-content-between small text-muted mt-1" style="font-size: 0.75rem;">
+                                <span>Nhận: <th:block th:text="${#temporals.format(item.ngayNhan, 'dd/MM/yyyy')}"></th:block></span>
+                                <span>Trả: <th:block th:text="${#temporals.format(item.ngayTra, 'dd/MM/yyyy')}"></th:block></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3" th:if="${chosenServices != null and !#lists.isEmpty(chosenServices)}">
+                        <div class="small fw-bold text-muted text-uppercase mb-2" style="font-size: 0.75rem;">Dịch vụ đăng ký thêm</div>
+                        <div th:each="dv : ${chosenServices}" class="d-flex justify-content-between mb-1 small">
+                            <span class="text-secondary" th:text="'+ ' + ${dv.tenDV ?: 'Dịch vụ lẻ'}">Tên dịch vụ</span>
+                            <span class="text-secondary fw-bold" th:text="${#numbers.formatDecimal(dv.giaTien ?: 0, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</span>
+                        </div>
+                    </div>
+
+                    <hr class="my-3">
+
+                    <div class="d-flex justify-content-between mb-2 small text-muted">
+                        <span>Tiền phòng gốc:</span>
+                        <span th:text="${#numbers.formatDecimal(cart.tongTienGioHang, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3 small text-muted" th:if="${totalDichVu != null and totalDichVu > 0}">
+                        <span>Tổng chi phí dịch vụ:</span>
+                        <span th:text="${#numbers.formatDecimal(totalDichVu, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center pt-3 border-top border-secondary">
+                        <span class="fs-5 fw-bold text-navy">Tổng tiền thanh toán:</span>
+                        <span class="fs-4 fw-bold text-danger"
+                              th:text="${#numbers.formatDecimal(finalTotal ?: cart.tongTienGioHang, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-7 order-lg-1">
+                <div class="card shadow-sm border-0 p-4 p-md-5">
+                    <h3 class="fw-bold text-navy text-uppercase mb-4">Xác nhận đơn đặt & Thanh toán</h3>
+
+                    <div th:if="${error}" class="alert alert-danger border-0 shadow-sm mb-4" th:text="${error}"></div>
+
+                    <form th:action="@{/booking/process-checkout}" method="post">
+
+                        <input type="hidden" th:name="${_csrf?.parameterName}" th:value="${_csrf?.token}" />
+
+                        <h5 class="fw-bold text-navy mb-3"><i class="bi bi-geo-alt-fill text-gold me-1"></i> Thông tin ghi chú nhận phòng</h5>
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold text-muted">Yêu cầu đặc biệt (Giờ check-in dự kiến, giường phụ...)</label>
+                            <textarea name="ghiChu" class="form-control" rows="3" placeholder="Nhập ghi chú của bạn tại đây..."></textarea>
+                        </div>
+
+                        <h5 class="fw-bold text-navy mb-3"><i class="bi bi-credit-card-2-front-fill text-gold me-1"></i> Chọn phương thức thanh toán <span class="text-danger">*</span></h5>
+                        <div class="row g-3 mb-4">
+
+                            <div class="col-md-6">
+                                <input type="radio" name="phuongThucThanhToan" value="COD" id="payCOD" class="payment-radio d-none" checked />
+                                <label for="payCOD" class="payment-method-card d-block p-4 h-100 position-relative">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-cash-coin text-gold fs-2 me-3"></i>
+                                        <h6 class="fw-bold text-navy m-0">Thanh toán tại quầy</h6>
+                                    </div>
+                                    <p class="text-muted small m-0 card-text">Thanh toán bằng tiền mặt hoặc quẹt thẻ trực tiếp khi làm thủ tục nhận phòng tại quầy lễ tân May Hotel.</p>
+                                    <i class="bi bi-check-circle-fill text-navy position-absolute top-0 end-0 m-2 fs-5" style="display: none;"></i>
+                                </label>
+                            </div>
+
+                            <div class="col-md-6">
+                                <input type="radio" name="phuongThucThanhToan" value="ONLINE" id="payOnline" class="payment-radio d-none" />
+                                <label for="payOnline" class="payment-method-card d-block p-4 h-100 position-relative">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-qr-code-scan text-gold fs-2 me-3"></i>
+                                        <h6 class="fw-bold text-navy m-0">Ví điện tử / Thẻ</h6>
+                                    </div>
+                                    <p class="text-muted small m-0 card-text">Thanh toán ngay lập tức qua cổng giả lập an toàn hỗ trợ quét mã ngân hàng VietQR, Momo, VNPAY có giới hạn thời gian.</p>
+                                    <i class="bi bi-check-circle-fill text-navy position-absolute top-0 end-0 m-2 fs-5" style="display: none;"></i>
+                                </label>
+                            </div>
+
+                        </div>
+
+                        <button type="submit" class="btn btn-gold w-100 py-3 fw-bold text-uppercase shadow-sm">
+                            Xác nhận đặt phòng ngay <i class="bi bi-arrow-right-short fs-5 ms-1"></i>
+                        </button>
+
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<th:block th:fragment="extra_js">
+</th:block>
+
+</body>
+</html>
