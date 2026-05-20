@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
-    // Kiểu Integer ở đây khớp với Integer của idTaiKhoan
     User findByTenDangNhap(String tenDangNhap);
+    User findByEmail(String email);
+    User findBySoDienThoai(String soDienThoai);
 }
