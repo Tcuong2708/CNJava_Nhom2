@@ -82,26 +82,27 @@
 
 /* Nút Đặt phòng: Màu Vàng Kim */
 .btn-add-cart-home {
-    background-color: var(--gold-color);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 10px;
-    font-weight: 600;
+    background-color: var(--gold-color) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 6px !important;
+    padding: 12px 20px !important;
+    font-weight: 700 !important;
     width: 100%;
     text-transform: uppercase;
-    font-size: 0.9rem;
-    transition: 0.3s;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 4px 12px rgba(197, 160, 23, 0.25);
 }
 
 .btn-add-cart-home:hover {
-    background-color: var(--gold-hover);
+    background-color: var(--gold-hover) !important;
+    color: white !important;
     transform: translateY(-2px);
-    color: white;
-    box-shadow: 0 4px 10px rgba(197, 160, 23, 0.3);
+    box-shadow: 0 6px 18px rgba(166, 133, 18, 0.45);
 }
 
-/* Nút Xem tất cả (Outline Navy) */
 .btn-outline-navy {
     color: var(--navy-color);
     border: 2px solid var(--navy-color);
